@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EchoLingua - Juego Auditivo de Inglés Accesible</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-high-contrast" data-font-size="medium">
+
+  <!-- Región de anuncios accesibles para lectores de pantalla -->
+  <div id="screen-reader-announcer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- Barra de accesibilidad superior -->
+  <header role="banner" class="header-container">
+    <div class="logo-area">
+      <h1 id="app-title" tabindex="0">🔊 EchoLingua</h1>
+      <p class="tagline" id="app-tagline">Aprende inglés mediante audio y accesibilidad total</p>
+    </div>
+
+    <!-- Controles rápidos accesibles -->
+    <nav class="quick-controls" aria-label="Controles de accesibilidad y ayuda">
+      <button id="btn-help" class="btn-ctrl" accesskey="h" aria-label="Ayuda y atajos de teclado (tecla H)">
+        ❓ Ayuda (H)
+      </button>
+      <button id="btn-theme" class="btn-ctrl" accesskey="t" aria-label="Cambiar contraste de color (tecla T)">
+        🎨 Contraste (T)
+      </button>
+      <button id="btn-font-size" class="btn-ctrl" accesskey="z" aria-label="Ajustar tamaño de texto (tecla Z)">
+        🔍 Tamaño (Z)
+      </button>
+      <button id="btn-voice-speed" class="btn-ctrl" accesskey="v" aria-label="Cambiar velocidad de voz (tecla V)">
+        ⚡ Voz: Normal (V)
+      </button>
+      <button id="btn-stop-speech" class="btn-ctrl" accesskey="p" aria-label="Silenciar o detener voz actual (tecla P)">
+        ⏹️ Silenciar (P)
+      </button>
+    </nav>
+  </header>
+
+  <main id="main-content" role="main">
+    
+    <!-- Pantalla 1: Selección de Modo de Juego -->
+    <section id="screen-menu" class="game-card" aria-labelledby="menu-title">
+      <h2 id="menu-title" tabindex="0">Selecciona tu Modo de Entrenamiento</h2>
+      <p class="section-desc" id="menu-instructions">
+        Usa las flechas, Tab, o presiona los números 1, 2 o 3 para elegir tu modo. Todos los textos se leerán en voz alta.
+      </p>
+
+      <div class="menu-grid">
+        <button id="mode-listening" class="mode-btn" data-key="1" aria-label="Modo 1: Escucha y Comprende. Escucha inglés y adivina el significado en español. Presiona 1">
+          <div class="mode-badge">Opción 1</div>
+          <div class="mode-name">🎧 Escucha y Comprende</div>
+          <div class="mode-desc">Entrena tu oído identificando palabras y frases en inglés con opciones audibles.</div>
+        </button>
+
+        <button id="mode-spelling" class="mode-btn" data-key="2" aria-label="Modo 2: Deletreo y Ortografía. Escucha la palabra y teclea cada letra. Presiona 2">
+          <div class="mode-badge">Opción 2</div>
+          <div class="mode-name">⌨️ Deletreo y Fonética</div>
+          <div class="mode-desc">Escucha la palabra en inglés y escribe sus letras. El juego te dirá cada letra pulsada.</div>
+        </button>
+
+        <button id="mode-sentence" class="mode-btn" data-key="3" aria-label="Modo 3: Completa la Oración. Selecciona la palabra que falta. Presiona 3">
+          <div class="mode-badge">Opción 3</div>
+          <div class="mode-name">🧩 Completa la Frase</div>
+          <div class="mode-desc">Escucha la oración con un espacio vacío y elige el término gramatical correcto.</div>
+        </button>
+      </div>
+
+      <!-- Selector de Nivel -->
+      <fieldset class="difficulty-group">
+        <legend class="difficulty-title">Nivel de Dificultad (Presiona B para Básico, I para Intermedio, A para Avanzado):</legend>
+        <div class="diff-options">
+          <button id="diff-basic" class="diff-btn active" data-diff="basic" aria-pressed="true">
+            🌱 Básico (A1)
+          </button>
+          <button id="diff-inter" class="diff-btn" data-diff="intermediate" aria-pressed="false">
+            🌿 Intermedio (A2)
+          </button>
+          <button id="diff-adv" class="diff-btn" data-diff="advanced" aria-pressed="false">
+            🌳 Avanzado (B1)
+          </button>
+        </div>
+      </fieldset>
+
+      <div class="stats-summary" id="stats-banner" tabindex="0" aria-label="Estadísticas de sesión">
+        <span>🏆 Puntos totales: <strong id="global-score">0</strong></span>
+        <span>🔥 Racha actual: <strong id="global-streak">0</strong></span>
+        <span>⭐ Preguntas acertadas: <strong id="global-correct">0</strong></span>
+      </div>
+    </section>
+
+    <!-- Pantalla 2: Interfaz Activa del Juego -->
+    <section id="screen-game" class="game-card hidden" aria-labelledby="game-active-title">
+      
+      <!-- Barra de estado del juego -->
+      <div class="game-status-bar" role="status">
+        <button id="btn-back-menu" class="btn-ctrl" accesskey="m" aria-label="Volver al menú principal (tecla M o Escape)">
+          ⬅️ Menú (M)
+        </button>
+        <div class="status-indicator">
+          <span>Ronda: <strong id="round-number">1 / 10</strong></span>
+          <span>Puntos: <strong id="current-score">0</strong></span>
+          <span>Racha: <strong id="current-streak">0</strong></span>
+        </div>
+      </div>
+
+      <h2 id="game-active-title" class="sr-only">Área de Pregunta</h2>
+
+      <!-- Tarjeta principal de estímulo sonoro/visual -->
+      <div class="challenge-box" id="challenge-box" tabindex="0">
+        <p class="challenge-prompt" id="challenge-instruction">Escucha la pronunciación en inglés:</p>
+        
+        <div class="target-word-display" id="target-word" aria-label="Palabra o frase en inglés">
+          ---
+        </div>
+
+        <div class="phonetic-tip" id="target-tip" aria-label="Consejo o traducción fonética">
+          Presiona Espacio para escuchar
+        </div>
+
+        <!-- Botones de Audio de Apoyo -->
+        <div class="audio-action-buttons">
+          <button id="btn-replay" class="btn-audio" accesskey="r" aria-label="Repetir audio en inglés a velocidad normal (tecla R o Espacio)">
+            🔁 Repetir (Espacio / R)
+          </button>
+          <button id="btn-slow" class="btn-audio" accesskey="l" aria-label="Escuchar más lento palabra por palabra (tecla L)">
+            🐢 Lento (L)
+          </button>
+          <button id="btn-spell-out" class="btn-audio" accesskey="s" aria-label="Escuchar deletreo letra por letra (tecla S)">
+            🔤 Deletrear (S)
+          </button>
+        </div>
+      </div>
+
+      <!-- Zona de Respuesta Dinámica según Modo -->
+      
+      <!-- Opción A: Modo Opciones Múltiples (Listening y Sentences) -->
+      <div id="container-multiple-choice" class="response-container">
+        <p class="options-helper" id="options-helper-text">
+          Elige la respuesta correcta usando las teclas 1, 2, 3 o 4:
+        </p>
+        <div class="options-grid" id="options-grid" role="group" aria-label="Opciones de respuesta">
+          <!-- Se inyectan con JS -->
+        </div>
+      </div>
+
+      <!-- Opción B: Modo Deletreo por Teclado -->
+      <div id="container-spelling" class="response-container hidden">
+        <p class="spelling-helper" id="spelling-helper-text">
+          Teclea las letras de la palabra en inglés. Puedes presionar Retroceso para borrar.
+        </p>
+        <div class="spelling-slots" id="spelling-slots" aria-label="Letras introducidas">
+          <!-- Casillas dinámicas -->
+        </div>
+        <div class="spelling-input-group">
+          <input type="text" id="spelling-input" class="spelling-real-input" 
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 aria-label="Escribe aquí las letras de la palabra en inglés"
+                 placeholder="Escribe aquí las letras...">
+          <button id="btn-check-spelling" class="btn-action" aria-label="Comprobar palabra escrita (tecla Enter)">
+            ✅ Comprobar (Enter)
+          </button>
+          <button id="btn-clear-spelling" class="btn-action" aria-label="Borrar todo">
+            🧹 Limpiar
+          </button>
+        </div>
+      </div>
+
+      <!-- Retroalimentación / Feedback auditivo y visual tras responder -->
+      <div id="feedback-panel" class="feedback-panel hidden" tabindex="0" role="alert" aria-live="polite">
+        <div class="feedback-icon" id="feedback-icon">🎉</div>
+        <div class="feedback-content">
+          <div class="feedback-title" id="feedback-title">¡Excelente!</div>
+          <div class="feedback-detail" id="feedback-detail">Explicación de la palabra y ejemplo.</div>
+        </div>
+        <button id="btn-next-question" class="btn-action next-btn" accesskey="n" aria-label="Siguiente pregunta (tecla N o Enter)">
+          ➡️ Siguiente Pregunta (N / Enter)
+        </button>
+      </div>
+
+    </section>
+
+    <!-- Modal accesible de Ayuda y Atajos de Teclado -->
+    <dialog id="modal-help" class="accessible-modal" aria-labelledby="modal-help-title">
+      <div class="modal-content">
+        <h2 id="modal-help-title" tabindex="0">Guía de Voz y Atajos de Teclado</h2>
+        <p>Este juego está totalmente diseñado para ser operado sin necesidad de ver la pantalla.</p>
+        
+        <div class="shortcuts-list">
+          <div class="shortcut-item">
+            <kbd>Espacio</kbd> o <kbd>R</kbd>
+            <span>Repetir la pronunciación en inglés actual</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>L</kbd>
+            <span>Escuchar la palabra a velocidad lenta (slow)</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>S</kbd>
+            <span>Escuchar el deletreo letra por letra</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>, <kbd>4</kbd>
+            <span>Seleccionar la opción correspondiente</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>N</kbd> o <kbd>Enter</kbd>
+            <span>Avanzar a la siguiente pregunta cuando esté disponible</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>M</kbd> o <kbd>Escape</kbd>
+            <span>Volver al menú principal de selección</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>V</kbd>
+            <span>Alternar velocidad de voz (Lenta, Normal, Rápida)</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>P</kbd>
+            <span>Pausar o silenciar la voz en cualquier instante</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>T</kbd>
+            <span>Alternar temas de alto contraste</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Z</kbd>
+            <span>Aumentar o restablecer tamaño de texto</span>
+          </div>
+        </div>
+
+        <button id="btn-close-help" class="btn-action" aria-label="Cerrar ventana de ayuda (tecla Escape)">
+          Entendido, Volver al Juego
+        </button>
+      </div>
+    </dialog>
+
+  </main>
+
+  <footer role="contentinfo" class="game-footer">
+    <p>EchoLingua &bull; Diseñado con amor para la inclusión, autonomía y aprendizaje del idioma inglés.</p>
+  </footer>
+
+  <!-- Scripts modulares -->
+  <script src="audio.js"></script>
+  <script src="words.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
